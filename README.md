@@ -1,39 +1,161 @@
 # Pool Room Table Service PWA
 
-This project is a Progressive Web App created for a billiard/pool room environment.  
-The main idea is to let customers access table services directly from their own phone by scanning a QR code placed on the table, instead of going to the front desk or calling staff manually.
+## Project Overview
 
-Once a table is selected, the user can start a session, pay for table time, order food and drinks, request service, and view venue information such as Wi-Fi details. The app is designed to make the process quicker, simpler, and more convenient for both customers and staff.
+This project is a Progressive Web Application (PWA) designed for a billiard (pool) venue.  
+It allows customers to access table services directly from their mobile device without needing to go to the front desk.
 
-## Main Features
+By scanning a QR code placed on a table or entering a table ID manually, users can start a session, order food and drinks, request service, and complete checkout.
 
-- Access a table by entering a table code or scanning a QR code
-- Use the camera to scan table QR codes
-- Use geolocation to check whether the user is inside the venue
-- Start a timed session for a billiard table
-- Track remaining session time
-- Extend or end a session
-- Order food and drinks from the table
-- Send service requests such as calling staff or asking for help
-- Checkout with table fee and food/drink total
-- Install the app as a PWA on a mobile device
-- Basic offline support through service worker caching
+The aim of this project is to improve efficiency and user experience within a real-world pool room environment.
+
+---
+
+## Key Features
+
+- QR code-based table access (Camera API)
+- Geolocation verification to ensure users are inside the venue
+- Session management with real-time countdown timer
+- Ability to extend or end sessions
+- Food and drink ordering system
+- Service request system (e.g. call staff, rack balls)
+- Checkout system (table fee + food and drinks total)
+- Installable PWA with offline capability
+
+---
 
 ## Technologies Used
 
-- React
-- Vite
+- React (Vite)
 - React Router
-- localStorage
-- Service Worker
+- LocalStorage (for data persistence)
+- Service Worker (for caching and offline support)
 - Web App Manifest
 - Geolocation API
-- Camera API
-- QR scanning
+- Camera API (QR code scanning)
 
-## How to Run the Project
+---
 
-Clone the repository:
+## Project Structure
 
-```bash
+The project is structured using a component-based architecture:
+
+src/
+ ├── pages/
+ │    ├── Home.jsx
+ │    ├── Table.jsx
+ │    ├── StartSession.jsx
+ │    ├── Menu.jsx
+ │    ├── Cart.jsx
+ │    ├── Service.jsx
+ │    ├── Wifi.jsx
+ │    └── Staff.jsx
+ │
+ ├── components/
+ │    ├── Layout.jsx
+ │    └── NavBar.jsx
+ │
+ ├── lib/
+ │    ├── session.js
+ │    ├── storage.js
+ │    ├── geo.js
+ │    └── useAccess.js
+ │
+ └── main.jsx
+
+---
+
+## Installation Instructions
+
+To run this project locally, follow the steps below:
+
+1. Clone the repository:
+
 git clone https://github.com/Jincheng7878/pool.git
+
+2. Navigate to the project directory:
+
+cd pool
+
+3. Install dependencies:
+
+npm install
+
+4. Start the development server:
+
+npm run dev
+
+5. Open the application in your browser:
+
+http://localhost:5173
+
+---
+
+## Deployment (Online Version)
+
+This project is deployed using Vercel:
+
+https://pool-k4lo1747c-jincheng-zhangs-projects.vercel.app/
+
+The deployed version allows full testing of:
+- PWA installation
+- QR scanning
+- Geolocation functionality
+
+---
+
+## How to Use the Application
+
+1. Open the application in a browser or on a mobile device  
+2. Enter a table ID or scan a QR code  
+3. Navigate to the table dashboard  
+4. Start a session and choose duration  
+5. Order food and drinks from the menu  
+6. Send service requests if needed  
+7. End the session and view checkout summary  
+
+---
+
+## Device APIs Used
+
+Geolocation API  
+Used to verify that the user is physically inside the venue before allowing access to certain features such as ordering and service requests.
+
+Camera API  
+Used to scan QR codes placed on tables, allowing users to directly access their table without manually entering a table ID.
+
+---
+
+## Data Storage and CRUD Operations
+
+The application uses browser localStorage for storing data.
+
+Examples include:
+- Active sessions
+- Cart items
+- Orders
+- Service requests
+
+CRUD operations are implemented as follows:
+
+- Create: starting a session, placing orders, creating service requests  
+- Read: retrieving session and order data  
+- Update: modifying cart quantities, updating order or request status  
+- Delete: ending sessions, clearing cart, cancelling requests  
+
+---
+
+## PWA Functionality
+
+This application is built as a Progressive Web App (PWA), which means:
+
+- It can be installed on mobile devices  
+- It works similarly to a native application  
+- It uses a service worker for caching resources  
+- It supports limited offline functionality  
+
+---
+
+## Author
+
+Jincheng Zhang

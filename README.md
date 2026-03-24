@@ -36,35 +36,6 @@ The aim of this project is to improve efficiency and user experience within a re
 
 ---
 
-## Project Structure
-
-The project is structured using a component-based architecture:
-
-src/
- ├── pages/
- │    ├── Home.jsx
- │    ├── Table.jsx
- │    ├── StartSession.jsx
- │    ├── Menu.jsx
- │    ├── Cart.jsx
- │    ├── Service.jsx
- │    ├── Wifi.jsx
- │    └── Staff.jsx
- │
- ├── components/
- │    ├── Layout.jsx
- │    └── NavBar.jsx
- │
- ├── lib/
- │    ├── session.js
- │    ├── storage.js
- │    ├── geo.js
- │    └── useAccess.js
- │
- └── main.jsx
-
----
-
 ## Installation Instructions
 
 To run this project locally, follow the steps below:

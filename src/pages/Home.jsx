@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "../components/Layout.jsx";
+import InstallButton from "../components/InstallButton.jsx";
 import { usePersistedState } from "../lib/usePersistedState.js";
 
 const LAST_TABLE_KEY = "poolroom:lastTableId";
@@ -13,8 +14,7 @@ export default function Home() {
     if (!tableId || typeof tableId !== "string") {
       setTableId("T12");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [tableId, setTableId]);
 
   function go(target) {
     const clean = (target ?? tableId ?? "").trim();
@@ -49,12 +49,25 @@ export default function Home() {
               Scan QR Code
             </Link>
 
+            <InstallButton />
+
             {tableId && tableId.trim() ? (
               <button className="btn btnGhost" onClick={() => setTableId("")}>
                 Clear
               </button>
             ) : null}
           </div>
+
+          {tableId && tableId.trim() ? (
+            <p className="small" style={{ marginTop: 10 }}>
+              Last table available: <b>{tableId.trim()}</b>
+            </p>
+          ) : null}
+
+          <p className="small" style={{ marginTop: 10 }}>
+            Tip: the QR code should contain either a full table URL or just a table code such as{" "}
+            <code>T12</code>.
+          </p>
         </div>
 
         <div className="card">

@@ -58,16 +58,8 @@ export default function Home() {
             ) : null}
           </div>
 
-          {tableId && tableId.trim() ? (
-            <p className="small" style={{ marginTop: 10 }}>
-              Last table available: <b>{tableId.trim()}</b>
-            </p>
-          ) : null}
+      
 
-          <p className="small" style={{ marginTop: 10 }}>
-            Tip: the QR code should contain either a full table URL or just a table code such as{" "}
-            <code>T12</code>.
-          </p>
         </div>
 
         <div className="card">

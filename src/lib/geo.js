@@ -1,8 +1,8 @@
 const GEO_CACHE_KEY = "pool_room_geo_cache_v1";
 
-export const VENUE_LAT = 55.84353;
+export const VENUE_LAT = 55.84359;
 export const VENUE_LNG = -4.42626;
-export const VENUE_RADIUS_M = 300;
+export const VENUE_RADIUS_M = 600;
 export const CACHE_TTL_MS = 30 * 1000;
 
 export function getGeoCache() {

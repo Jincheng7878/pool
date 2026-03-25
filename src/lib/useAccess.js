@@ -9,10 +9,11 @@ export function useAccess(tableId) {
   const hasPaidSession = !!session?.paid;
 
   let blockMessage = "";
+
   if (!insideVenue) {
-    blockMessage = "You must be inside the venue to access table services.";
+    blockMessage = "You must be inside the venue to access this table.";
   } else if (!hasPaidSession) {
-    blockMessage = "Start and pay for a session to unlock ordering and service features.";
+    blockMessage = "Start and pay for a session to unlock services.";
   }
 
   async function verify() {

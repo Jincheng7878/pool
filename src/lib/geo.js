@@ -1,17 +1,23 @@
 const GEO_CACHE_KEY = "pool_room_geo_cache_v1";
 
-export const VENUE_LAT = 55.86522;
-export const VENUE_LNG = -4.25352;
+export const VENUE_LAT = 55.84353;
+export const VENUE_LNG = -4.42626;
 export const VENUE_RADIUS_M = 300;
-export const CACHE_TTL_MS = 5 * 60 * 1000;
+export const CACHE_TTL_MS = 30 * 1000;
 
 export function getGeoCache() {
   try {
     const raw = localStorage.getItem(GEO_CACHE_KEY);
     if (!raw) return null;
+
     const obj = JSON.parse(raw);
     if (!obj?.timestamp) return null;
-    if (Date.now() - obj.timestamp > CACHE_TTL_MS) return null;
+
+    if (Date.now() - obj.timestamp > CACHE_TTL_MS) {
+      localStorage.removeItem(GEO_CACHE_KEY);
+      return null;
+    }
+
     return obj;
   } catch {
     return null;
@@ -21,8 +27,15 @@ export function getGeoCache() {
 export function setGeoCache(payload) {
   localStorage.setItem(
     GEO_CACHE_KEY,
-    JSON.stringify({ ...payload, timestamp: Date.now() })
+    JSON.stringify({
+      ...payload,
+      timestamp: Date.now(),
+    })
   );
+}
+
+export function clearGeoCache() {
+  localStorage.removeItem(GEO_CACHE_KEY);
 }
 
 export function distanceMeters(lat1, lng1, lat2, lng2) {
@@ -42,20 +55,26 @@ export function distanceMeters(lat1, lng1, lat2, lng2) {
 
 export function isInsideVenue(lat, lng) {
   const d = distanceMeters(lat, lng, VENUE_LAT, VENUE_LNG);
-  return { inside: d <= VENUE_RADIUS_M, distanceM: d };
+  return {
+    inside: d <= VENUE_RADIUS_M,
+    distanceM: d,
+  };
 }
 
 export function requestGeolocation(options = {}) {
   return new Promise((resolve) => {
     if (!("geolocation" in navigator)) {
-      resolve({ ok: false, error: "Geolocation is not supported on this device/browser." });
+      resolve({
+        ok: false,
+        error: "Geolocation is not supported on this device/browser.",
+      });
       return;
     }
 
     const geoOpts = {
       enableHighAccuracy: true,
       timeout: 12000,
-      maximumAge: 10000,
+      maximumAge: 0,
       ...options,
     };
 
@@ -67,14 +86,29 @@ export function requestGeolocation(options = {}) {
 
         const { inside, distanceM } = isInsideVenue(lat, lng);
 
-        resolve({ ok: true, lat, lng, accuracy, inside, distanceM });
+        const payload = {
+          ok: true,
+          lat,
+          lng,
+          accuracy,
+          inside,
+          distanceM,
+        };
+
+        setGeoCache(payload);
+        resolve(payload);
       },
       (err) => {
         let msg = "Location permission denied or unavailable.";
         if (err?.code === 1) msg = "Location permission denied.";
         if (err?.code === 2) msg = "Location unavailable.";
         if (err?.code === 3) msg = "Location request timed out.";
-        resolve({ ok: false, error: msg });
+
+        clearGeoCache();
+        resolve({
+          ok: false,
+          error: msg,
+        });
       },
       geoOpts
     );

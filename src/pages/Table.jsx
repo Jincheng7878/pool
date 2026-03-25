@@ -63,6 +63,35 @@ export default function Table() {
     window.setTimeout(() => setToast(""), 1800);
   }
 
+  if (!access.venue.inside) {
+    return (
+      <Layout
+        title="Location Restricted"
+        subtitle="This table can only be accessed from inside the venue."
+        badgeRight={`Table: ${tableId}`}
+        locationBadge={access.venue.badge}
+      >
+        <NavBar tableId={tableId} />
+
+        <div className="card">
+          <h3 className="cardTitle">Access Blocked</h3>
+          <p className="p">
+            You are currently outside the permitted venue area. Please move inside the venue and verify your location again.
+          </p>
+
+          <div className="row">
+            <button className="btn btnPrimary" onClick={access.venue.verify}>
+              Verify Location
+            </button>
+            <Link className="btn" to="/">
+              Back to Home
+            </Link>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout
       title="Table Dashboard"

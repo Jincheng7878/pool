@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Webcam from "react-webcam";
 import jsQR from "jsqr";
 import Layout from "../components/Layout.jsx";
+import { requestGeolocation, clearGeoCache } from "../lib/geo.js";
 
 const videoConstraints = {
   width: 1280,
@@ -14,13 +15,11 @@ function extractTableId(rawValue) {
   const raw = (rawValue || "").trim();
   if (!raw) return null;
 
-  // Case 1: full URL such as https://example.com/table/T12
   const urlMatch = raw.match(/\/table\/([^/?#]+)/i);
   if (urlMatch?.[1]) {
     return decodeURIComponent(urlMatch[1]).trim();
   }
 
-  // Case 2: plain code such as T12 / A3 / VIP1
   const simpleCode = raw.match(/^[A-Za-z0-9_-]{1,20}$/);
   if (simpleCode) {
     return raw;
@@ -49,8 +48,34 @@ export default function Scan() {
     setIsScanning(false);
   }, []);
 
+  const handleValidatedRedirect = useCallback(
+    async (tableId) => {
+      setStatus("Verifying venue location...");
+      setError("");
+
+      clearGeoCache();
+      const geo = await requestGeolocation();
+
+      if (!geo.ok) {
+        setError(geo.error || "Location verification failed.");
+        setStatus("Location verification failed.");
+        return;
+      }
+
+      if (!geo.inside) {
+        setError("You are outside the permitted venue area.");
+        setStatus("Access blocked: outside venue.");
+        return;
+      }
+
+      setStatus(`Verified. Opening table ${tableId}...`);
+      navigate(`/table/${encodeURIComponent(tableId)}`);
+    },
+    [navigate]
+  );
+
   const handleScanSuccess = useCallback(
-    (decodedText) => {
+    async (decodedText) => {
       const tableId = extractTableId(decodedText);
 
       if (!tableId) {
@@ -60,12 +85,10 @@ export default function Scan() {
       }
 
       stopLoop();
-      setError("");
       setLastResult(decodedText);
-      setStatus(`QR detected: ${tableId}`);
-      navigate(`/table/${encodeURIComponent(tableId)}`);
+      await handleValidatedRedirect(tableId);
     },
-    [navigate, stopLoop]
+    [handleValidatedRedirect, stopLoop]
   );
 
   const scanFrame = useCallback(() => {
@@ -115,10 +138,10 @@ export default function Scan() {
     };
   }, [stopLoop]);
 
-  function handleManualContinue() {
+  async function handleManualContinue() {
     const clean = manualCode.trim();
     if (!clean) return;
-    navigate(`/table/${encodeURIComponent(clean)}`);
+    await handleValidatedRedirect(clean);
   }
 
   return (
@@ -176,6 +199,16 @@ export default function Scan() {
               Stop
             </button>
           </div>
+
+          {lastResult ? (
+            <p className="small" style={{ marginTop: 10 }}>
+              Last QR content: <code>{lastResult}</code>
+            </p>
+          ) : null}
+
+          <p className="small" style={{ marginTop: 10 }}>
+            Supported QR content: a full table URL or a simple code such as <code>T12</code>.
+          </p>
         </div>
 
         <div className="card">

@@ -4,6 +4,7 @@ import Layout from "../components/Layout.jsx";
 import NavBar from "../components/NavBar.jsx";
 import { getSession, startSession, extendSession, endSession } from "../lib/session.js";
 import { useSessionTimer } from "../lib/useSessionTimer.js";
+import { useAccess } from "../lib/useAccess.js";
 
 const OPTIONS = [
   { label: "30 minutes", value: 30, price: 4.5 },
@@ -14,6 +15,8 @@ const OPTIONS = [
 
 export default function StartSession() {
   const { tableId } = useParams();
+  const access = useAccess(tableId);
+
   const [selectedMinutes, setSelectedMinutes] = useState(60);
   const [refreshKey, setRefreshKey] = useState(0);
   const [toast, setToast] = useState("");
@@ -30,12 +33,22 @@ export default function StartSession() {
   }
 
   function handleStart() {
+    if (!access.venue.inside) {
+      showToast("You must be inside the venue to start a session.");
+      return;
+    }
+
     startSession(tableId, selectedOption.value, selectedOption.price);
     setRefreshKey((v) => v + 1);
     showToast(`Session started for ${selectedOption.value} minutes.`);
   }
 
   function handleExtend(extraMinutes) {
+    if (!access.venue.inside) {
+      showToast("You must be inside the venue to extend a session.");
+      return;
+    }
+
     let extraFee = 0;
 
     if (extraMinutes === 30) extraFee = 4.5;
@@ -61,11 +74,45 @@ export default function StartSession() {
 
   const hasActiveSession = session && !timer.isExpired;
 
+  if (!access.venue.inside) {
+    return (
+      <Layout
+        title="Location Restricted"
+        subtitle="Sessions can only be started from inside the venue."
+        badgeRight={`Table: ${tableId}`}
+        locationBadge={access.venue.badge}
+      >
+        <NavBar tableId={tableId} />
+
+        <div className="card">
+          <h3 className="cardTitle">Start Session Blocked</h3>
+          <p className="p">
+            You are currently outside the permitted venue area. Please move inside
+            the venue and verify your location before starting or extending a session.
+          </p>
+
+          <div className="row">
+            <button className="btn btnPrimary" onClick={access.venue.verify}>
+              Verify Location
+            </button>
+            <Link className="btn" to={`/table/${tableId}`}>
+              Back to Table
+            </Link>
+            <Link className="btn" to="/">
+              Back to Home
+            </Link>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout
       title="Start & Pay"
       subtitle="Choose a play duration and begin the table session."
       badgeRight={`Table: ${tableId}`}
+      locationBadge={access.venue.badge}
     >
       <NavBar tableId={tableId} />
 

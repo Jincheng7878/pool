@@ -1,5 +1,3 @@
-// src/lib/useSessionTimer.js
-
 import { useEffect, useState } from "react";
 
 export function useSessionTimer(endAt) {

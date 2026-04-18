@@ -32,7 +32,7 @@ function uid(prefix = "id") {
   return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now()}`;
 }
 
-/** MENU */
+
 export function getMenu() {
   return loadDb().menu;
 }
@@ -42,7 +42,7 @@ export function setMenu(items) {
   saveDb(db);
 }
 
-/** CART (CRUD) */
+
 export function getCart(tableId) {
   const db = loadDb();
   return db.carts[tableId] ?? [];
@@ -71,7 +71,7 @@ export function clearCart(tableId) {
   saveDb(db);
 }
 
-/** ORDER (CRUD) */
+
 export function createOrderFromCart(tableId) {
   const db = loadDb();
   const cart = db.carts[tableId] ?? [];
@@ -119,7 +119,7 @@ export function updateOrderStatus(orderId, status) {
   saveDb(db);
 }
 
-/** SERVICE REQUEST (CRUD) */
+
 export function createServiceRequest(tableId, type) {
   const db = loadDb();
   const id = uid("req");
@@ -150,7 +150,7 @@ export function updateServiceStatus(reqId, status) {
   saveDb(db);
 }
 
-/** SESSION */
+
 export function startSession(tableId, minutes) {
   const db = loadDb();
   const id = uid("sess");
@@ -182,7 +182,7 @@ export function markSessionPaid(sessionId) {
   saveDb(db);
 }
 
-/** STAFF HELPERS (read-only lists) */
+
 export function listAllOrders() {
   const db = (function loadDbInner() {
     const raw = localStorage.getItem("pool_room_app_v1");
@@ -224,19 +224,19 @@ export function listKnownTables() {
 
   const set = new Set();
 
-  // tables map
+ 
   if (db?.tables) Object.keys(db.tables).forEach((t) => set.add(t));
 
-  // sessions
+ 
   if (db?.sessions) Object.values(db.sessions).forEach((s) => s?.tableId && set.add(s.tableId));
 
-  // orders
+  
   if (db?.orders) Object.values(db.orders).forEach((o) => o?.tableId && set.add(o.tableId));
 
-  // service requests
+
   if (db?.serviceRequests) Object.values(db.serviceRequests).forEach((r) => r?.tableId && set.add(r.tableId));
 
-  // Sort: try natural-ish sort (T2 < T12)
+  
   const arr = Array.from(set);
   arr.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
   return arr;

@@ -4,7 +4,8 @@ export const VENUE_LAT = 55.86540;
 export const VENUE_LNG = -4.25322;
 export const VENUE_RADIUS_M = 6000;
 export const CACHE_TTL_MS = 5 * 1000;
-export const MAX_ACCEPTABLE_ACCURACY_M = 2000;
+export const MAX_ACCEPTABLE_ACCURACY_M = 1500;
+export const HYSTERESIS_BUFFER_M = 300;
 
 export function getGeoCache() {
   try {
@@ -56,10 +57,21 @@ export function distanceMeters(lat1, lng1, lat2, lng2) {
   return R * c;
 }
 
-export function isInsideVenue(lat, lng) {
+export function isInsideVenue(lat, lng, previousInside = null) {
   const d = distanceMeters(lat, lng, VENUE_LAT, VENUE_LNG);
+
+  let inside;
+
+  if (previousInside === true) {
+    inside = d <= VENUE_RADIUS_M + HYSTERESIS_BUFFER_M;
+  } else if (previousInside === false) {
+    inside = d <= VENUE_RADIUS_M - HYSTERESIS_BUFFER_M;
+  } else {
+    inside = d <= VENUE_RADIUS_M;
+  }
+
   return {
-    inside: d <= VENUE_RADIUS_M,
+    inside,
     distanceM: d,
   };
 }
@@ -73,6 +85,8 @@ export function requestGeolocation(options = {}) {
       });
       return;
     }
+
+    const previous = getGeoCache();
 
     const geoOpts = {
       enableHighAccuracy: true,
@@ -88,17 +102,20 @@ export function requestGeolocation(options = {}) {
         const accuracy = pos.coords.accuracy;
 
         if (accuracy > MAX_ACCEPTABLE_ACCURACY_M) {
-          clearGeoCache();
           resolve({
             ok: false,
             error: `Location accuracy is too low (${Math.round(
               accuracy
-            )}m). Please enable Precise Location and try again.`,
+            )}m). Please try again.`,
           });
           return;
         }
 
-        const { inside, distanceM } = isInsideVenue(lat, lng);
+        const { inside, distanceM } = isInsideVenue(
+          lat,
+          lng,
+          previous?.inside ?? null
+        );
 
         const payload = {
           ok: true,
@@ -118,7 +135,6 @@ export function requestGeolocation(options = {}) {
         if (err?.code === 2) msg = "Location unavailable.";
         if (err?.code === 3) msg = "Location request timed out.";
 
-        clearGeoCache();
         resolve({
           ok: false,
           error: msg,

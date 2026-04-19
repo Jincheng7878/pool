@@ -3,7 +3,8 @@ const GEO_CACHE_KEY = "pool_room_geo_cache_v1";
 export const VENUE_LAT = 55.86540;
 export const VENUE_LNG = -4.25322;
 export const VENUE_RADIUS_M = 6000;
-export const CACHE_TTL_MS = 50 * 1000;
+export const CACHE_TTL_MS = 5 * 1000;
+export const MAX_ACCEPTABLE_ACCURACY_M = 2000;
 
 export function getGeoCache() {
   try {
@@ -47,7 +48,9 @@ export function distanceMeters(lat1, lng1, lat2, lng2) {
 
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLng / 2) ** 2;
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
@@ -73,7 +76,7 @@ export function requestGeolocation(options = {}) {
 
     const geoOpts = {
       enableHighAccuracy: true,
-      timeout: 12000,
+      timeout: 15000,
       maximumAge: 0,
       ...options,
     };
@@ -83,6 +86,17 @@ export function requestGeolocation(options = {}) {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
         const accuracy = pos.coords.accuracy;
+
+        if (accuracy > MAX_ACCEPTABLE_ACCURACY_M) {
+          clearGeoCache();
+          resolve({
+            ok: false,
+            error: `Location accuracy is too low (${Math.round(
+              accuracy
+            )}m). Please enable Precise Location and try again.`,
+          });
+          return;
+        }
 
         const { inside, distanceM } = isInsideVenue(lat, lng);
 

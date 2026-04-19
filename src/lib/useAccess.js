@@ -1,11 +1,12 @@
 import { getSession } from "./session.js";
-import { getGeoCache, requestGeolocation } from "./geo.js";
+import { getGeoCache, getVenuePass, requestGeolocation } from "./geo.js";
 
 export function useAccess(tableId) {
   const session = getSession(tableId);
   const geo = getGeoCache();
+  const venuePass = getVenuePass();
 
-  const insideVenue = !!geo?.inside;
+  const insideVenue = !!venuePass?.inside || !!geo?.inside;
   const hasPaidSession = !!session?.paid;
 
   let blockMessage = "";

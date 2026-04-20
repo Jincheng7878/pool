@@ -66,7 +66,7 @@ http://localhost:5173
 
 This project is deployed using Vercel:
 
-https://pool-k4lo1747c-jincheng-zhangs-projects.vercel.app/
+https://pool-dusky.vercel.app/
 
 The deployed version allows full testing of:
 - PWA installation

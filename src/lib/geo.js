@@ -1,8 +1,8 @@
 const GEO_CACHE_KEY = "pool_room_geo_cache_v1";
 const VENUE_PASS_KEY = "pool_room_venue_pass_v1";
 
-export const VENUE_LAT = 55.8654;
-export const VENUE_LNG = -4.25322;
+export const VENUE_LAT = 55.84313;
+export const VENUE_LNG = -4.43045;
 export const VENUE_RADIUS_M = 6000;
 export const CACHE_TTL_MS = 5 * 1000;
 export const VENUE_PASS_TTL_MS = 2 * 60 * 60 * 1000;
